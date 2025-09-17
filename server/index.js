@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/userRouter");
+const authRouter = require("./routes/authRouter");
+const authenticateJWT = require("./middleware/authenticateJWT");
 require("dotenv").config();
 const corsOption = {
   origin: "http://localhost:5173",
@@ -28,6 +30,7 @@ app.get("/api", (req, res) => {
 });
 
 app.use("/", userRouter);
+app.use("/", authRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}/api`);
