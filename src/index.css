@@ -41,6 +41,15 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* @theme {
+  --color-main: #07737a;
+  --color-sec: #88dbdf;
+  --color-sub: #f3e03b;
+  --color-sub-alt: #26858b;
+  --color-err: #ff585d;
+  --color-text: #ffffff;
+} */
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -114,6 +123,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
