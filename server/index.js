@@ -3,7 +3,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
-const authenticateJWT = require("./middleware/authenticateJWT");
+const { createServer } = require("node:http");
+const { Server } = require("socket.io");
 require("dotenv").config();
 const corsOption = {
   origin: "http://localhost:5173",
@@ -11,6 +12,14 @@ const corsOption = {
 };
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
 const PORT = process.env.PORT || 3000;
 
@@ -32,6 +41,10 @@ app.get("/api", (req, res) => {
 app.use("/", userRouter);
 app.use("/", authRouter);
 
-app.listen(PORT, () => {
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
+});
+
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}/api`);
 });
