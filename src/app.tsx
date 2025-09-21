@@ -1,16 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/home";
+import LandingPage from "./pages/landing-page";
 import { AuthProvider, useAuth } from "./contexts/auth-context";
+import Home from "./pages/home";
+import { Toaster } from "sonner";
 
 const AppContent = () => {
   const { user } = useAuth();
 
-  // return (
-  //   <div className="App">
-  //     {user ? <DiscordApp /> : <Home />}
-  //     <Toaster />
-  //   </div>
-  // );
+  return (
+    <div className="App">
+      {user ? <Home /> : <LandingPage />}
+      <Toaster />
+    </div>
+  );
 };
 
 function App() {
@@ -18,7 +20,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<AppContent />} />
         </Routes>
       </Router>
     </AuthProvider>
