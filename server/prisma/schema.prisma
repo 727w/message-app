@@ -1,14 +1,91 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// schema.prisma
+datasource db {
+  provider = "postgresql" // atau mysql/sqlite sesuai kebutuhanmu
+  url      = env("DB_URL")
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DB_URL")
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  username String @unique
+  password String
+
+  // profile customization
+  profile Profile?
+
+  // relations
+  sentMessages     Message[]     @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+  groups           GroupMember[] @relation("UserGroups")
+  sessions         Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  displayName String?
+  bio         String?
+  avatarUrl   String?
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id         String  @id @default(cuid())
+  senderId   String
+  content    String? // text message
+  imageUrl   String? // optional image message
+  groupId    String? // kalau dikirim ke grup
+  receiverId String? // kalau direct message (user to user)
+
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User?  @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  group    Group? @relation(fields: [groupId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Group {
+  id        String  @id @default(cuid())
+  name      String
+  avatarUrl String?
+
+  members  GroupMember[]
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GroupMember {
+  id      String    @id @default(cuid())
+  userId  String
+  groupId String
+  role    GroupRole @default(MEMBER)
+
+  user  User  @relation("UserGroups", fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
+
+  joinedAt DateTime @default(now())
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
+}
+
+model Session {
+  id       String   @id @default(cuid())
+  userId   String
+  isActive Boolean  @default(true)
+  lastSeen DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
