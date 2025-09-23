@@ -1,4 +1,4 @@
-import { type FC, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import ServerSidebar from "../components/server-sidebar";
 import ChannelSidebar from "../components/channel-sidebar";
 import ChatArea from "../components/chat-area";
@@ -12,7 +12,8 @@ import {
   mockCurrentUser,
 } from "../mock";
 import { useAuth } from "../contexts/auth-context";
-import type { Message, User } from "../types/types";
+import type { Message } from "../types/types";
+import { io } from "socket.io-client";
 
 const Home: FC = () => {
   const { user, logout } = useAuth();
@@ -20,9 +21,11 @@ const Home: FC = () => {
   // Gunakan tipe Message[] untuk state messages
   const [messages, setMessages] = useState<Message[]>(mockMessages);
 
-  const [selectedServer, setSelectedServer] = useState<string>("1");
+  const [, setSelectedServer] = useState<string>("1");
   const [selectedChannel, setSelectedChannel] = useState<string>("1");
   const [selectedDM, setSelectedDM] = useState<string | null>(null);
+
+  const socket = io("http://localhost:3000");
 
   const handleServerSelect = (serverId: string): void => {
     setSelectedServer(serverId);
@@ -41,8 +44,9 @@ const Home: FC = () => {
 
   const handleSendMessage = (content: string): void => {
     if (!user) return; // jika user belum siap
+
     const newMessage: Message = {
-      id: `msg-${Date.now()}`,
+      id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       userId: user.id,
       username: user.username,
       avatar: user.avatar,
@@ -51,7 +55,25 @@ const Home: FC = () => {
       reactions: [],
     };
     setMessages((prev) => [...prev, newMessage]);
+    socket.emit("message", newMessage);
   };
+
+  useEffect(() => {
+    socket.on("receive_message", (msg) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          ...msg,
+          // pastikan timestamp jadi Date object
+          timestamp: new Date(msg.timestamp ?? Date.now()),
+        },
+      ]);
+    });
+
+    return () => {
+      socket.off("receive_message");
+    };
+  }, [socket]);
 
   const handleAddReaction = (messageId: string, emoji: string): void => {
     setMessages((prev) =>

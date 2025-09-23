@@ -42,7 +42,12 @@ app.use("/", userRouter);
 app.use("/", authRouter);
 
 io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+  socket.on("message", (msg) => {
+    socket.broadcast.emit("receive_message", {
+      ...msg,
+      timestamp: new Date(),
+    });
+  });
 });
 
 server.listen(PORT, () => {
