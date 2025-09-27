@@ -3,6 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
+const messageRouter = require("./routes/messageRouter");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 require("dotenv").config();
@@ -40,6 +41,7 @@ app.get("/api", (req, res) => {
 
 app.use("/", userRouter);
 app.use("/", authRouter);
+app.use("/", messageRouter);
 
 io.on("connection", (socket) => {
   socket.on("message", (msg) => {
