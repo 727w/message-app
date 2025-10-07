@@ -28,12 +28,18 @@ async function addMessage(req, res) {
 }
 
 async function getDirectMessages(req, res) {
+  const { receiverId } = req.params;
+  if (req.user.id === receiverId) {
+    return res
+      .status(400)
+      .json({ error: "Cannot retrieve messages with yourself" });
+  }
   try {
     const messages = await prisma.message.findMany({
       where: {
         OR: [
-          { senderId: req.user.id, receiverId: req.params.receiverId },
-          { senderId: req.params.receiverId, receiverId: req.user.id },
+          { senderId: req.user.id, receiverId },
+          { senderId: receiverId, receiverId: req.user.id },
         ],
       },
       orderBy: { createdAt: "asc" },
@@ -44,6 +50,39 @@ async function getDirectMessages(req, res) {
   }
 }
 
+async function createGroup(req, res) {
+  const { name, memberId } = req.body;
+  const memberIds = Array.from(new Set([...memberId, req.user.id.toString()]));
+  const image = req.file;
+  const imagePath = image?.filename;
+  if (
+    !name ||
+    !memberIds ||
+    !Array.isArray(memberIds) ||
+    memberIds.length === 0
+  ) {
+    return res.status(400).json({ error: "Invalid group data" });
+  }
+  try {
+    const newGroup = await prisma.group.create({
+      data: {
+        name,
+        avatarUrl: imagePath ?? null,
+        members: {
+          create: memberIds.map((userId) => ({
+            user: { connect: { id: userId } },
+            role: userId === req.user.id.toString() ? "ADMIN" : "MEMBER",
+          })),
+        },
+      },
+      include: { members: true },
+    });
+    return res.status(201).json(newGroup);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+}
+
 async function getGroupMessages(req, res) {
   try {
     const { groupId } = req.params;
@@ -51,7 +90,7 @@ async function getGroupMessages(req, res) {
       where: { groupId: groupId },
       orderBy: { createdAt: "asc" },
     });
-    return messages;
+    return res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving messages" });
   }
@@ -60,5 +99,6 @@ async function getGroupMessages(req, res) {
 module.exports = {
   addMessage,
   getDirectMessages,
+  createGroup,
   getGroupMessages,
 };
