@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
 const messageRouter = require("./routes/messageRouter");
+const contactRouter = require("./routes/contactRouter");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 require("dotenv").config();
@@ -42,6 +43,7 @@ app.get("/api", (req, res) => {
 app.use("/", userRouter);
 app.use("/", authRouter);
 app.use("/", messageRouter);
+app.use("/", contactRouter);
 
 io.on("connection", (socket) => {
   socket.on("message", (msg) => {

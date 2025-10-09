@@ -28,6 +28,10 @@ async function addMessage(req, res) {
 }
 
 async function getDirectMessages(req, res) {
+  const ownerId = req.user?.id;
+  if (!ownerId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
   const { receiverId } = req.params;
   if (req.user.id === receiverId) {
     return res
@@ -35,11 +39,21 @@ async function getDirectMessages(req, res) {
       .json({ error: "Cannot retrieve messages with yourself" });
   }
   try {
+    const contact = await prisma.contact.findUnique({
+      where: {
+        ownerId_contactId: {
+          ownerId,
+          contactId: receiverId,
+        },
+      },
+    });
+
+    const isBlocked = contact?.blocked === true;
     const messages = await prisma.message.findMany({
       where: {
         OR: [
           { senderId: req.user.id, receiverId },
-          { senderId: receiverId, receiverId: req.user.id },
+          ...(isBlocked ? [] : [{ senderId: receiverId, receiverId: ownerId }]),
         ],
       },
       orderBy: { createdAt: "asc" },
