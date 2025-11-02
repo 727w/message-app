@@ -3,18 +3,28 @@ const prisma = new PrismaClient();
 
 async function addMessage(req, res) {
   const { type, targetId } = req.body;
+  const image = req.file;
+  const imageUrl = image?.filename ?? null;
+
+  if (type !== "direct" && type !== "group") {
+    return res.status(400).json({ error: "Invalid message type" });
+  }
+
+  if (req.user.id === targetId) {
+    return res.status(400).json({ error: "Cannot send message to yourself" });
+  }
+  
+  if (!req.user || !req.user.id) {
+    return res.status(401).json({ error: "Unauthorized: senderId missing" });
+  }
 
   const messageData = {
     senderId: req.user.id,
     content: req.body.content,
-    imageUrl: req.body.imageUrl ?? null,
+    imageUrl,
     receiverId: type === "direct" ? targetId : null,
     groupId: type === "group" ? targetId : null,
   };
-
-  if (!req.user || !req.user.id) {
-    return res.status(401).json({ error: "Unauthorized: senderId missing" });
-  }
 
   try {
     const newMsg = await prisma.message.create({
