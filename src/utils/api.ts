@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-async function sendMessage(content: string, context: {type: "direct"|"group"; targetId: string}) {
+async function sendMessage(content: string, context: { type: "direct" | "group"; targetId: string }) {
   try {
     await axios.post(
       "/api/new/messages",
