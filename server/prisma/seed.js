@@ -17,7 +17,7 @@ async function main() {
     data: {
       displayName: "Amba",
       bio: "Hello I'm Amba",
-      avatarUrl: files[0] ?? null, // filename stored in DB
+      avatarUrl: null, // filename stored in DB
       user: { connect: { id: u1.id } },
     },
   });
@@ -26,7 +26,7 @@ async function main() {
     data: {
       displayName: "Gurt",
       bio: "Hello I'm Gurt",
-      avatarUrl: files[1] ?? null,
+      avatarUrl: null,
       user: { connect: { id: u2.id } },
     },
   });
@@ -37,7 +37,7 @@ async function main() {
       senderId: u1.id,
       receiverId: u2.id,
       content: "Here is an image",
-      imageUrl: files[2] ?? null,
+      imageUrl: null,
     },
   });
 
