@@ -116,7 +116,7 @@ const ChatArea: FC<ChatAreaProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-700">
+    <div className="flex-1 flex flex-col bg-foreground border border-gray-700">
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-600 flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -143,7 +143,7 @@ const ChatArea: FC<ChatAreaProps> = ({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div className="flex-1 overflow-y-scroll example px-4 py-4 space-y-4">
         {messages.map((message, index) => {
           const previousMessage = index > 0 ? messages[index - 1] : undefined;
           const showDateSeparator = shouldShowDateSeparator(
@@ -226,7 +226,7 @@ const ChatArea: FC<ChatAreaProps> = ({
       {/* Input */}
       <div className="px-4 pb-6">
         <form onSubmit={handleSendMessage} className="relative">
-          <div className="flex items-center bg-gray-600 rounded-lg px-4 py-3">
+          <div className="flex items-center bg-accent-foreground rounded-lg px-4 py-3">
             <Button
               type="button"
               variant="ghost"
@@ -242,7 +242,7 @@ const ChatArea: FC<ChatAreaProps> = ({
                 setNewMessage(e.target.value)
               }
               placeholder={`Message #${channelName}`}
-              className="flex-1 bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 focus:border-none"
+              className="flex-1 bg-transparent border-none text-white focus:ring-0 focus:border-none"
             />
 
             <div className="flex items-center space-x-2 ml-3">
@@ -252,7 +252,7 @@ const ChatArea: FC<ChatAreaProps> = ({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="text-gray-400 hover:text-white hover:bg-gray-500 w-6 h-6 p-0"
+                  className="text-gray-400 hover:text-white hover:bg-gray-500 w-6 h-6 p-0 cursor-pointer"
                 >
                   <Icon className="w-5 h-5" />
                 </Button>

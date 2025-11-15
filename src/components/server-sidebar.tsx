@@ -16,12 +16,12 @@ interface ServerSidebarProps {
 
 const ServerSidebar: FC<ServerSidebarProps> = ({ servers, onServerSelect }) => {
   return (
-    <div className="w-18 bg-gray-900 flex flex-col items-center py-3 space-y-2">
+    <div className="w-18 bg-foreground flex flex-col items-center py-3 space-y-2">
       {/* Home Server */}
       <Button
         variant="ghost"
         size="icon"
-        className="w-12 h-12 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl hover:rounded-xl transition-all duration-200"
+        className="w-12 h-12 bg-cyan-800 hover:bg-indigo-500 text-white rounded-2xl hover:rounded-xl transition-all duration-200"
         onClick={() => onServerSelect("home")}
       >
         <Home className="w-6 h-6" />
@@ -38,8 +38,8 @@ const ServerSidebar: FC<ServerSidebarProps> = ({ servers, onServerSelect }) => {
           size="icon"
           className={`w-12 h-12 text-white font-semibold text-lg transition-all duration-200 ${
             server.isActive
-              ? "bg-indigo-600 rounded-xl"
-              : "bg-gray-700 hover:bg-indigo-600 rounded-2xl hover:rounded-xl"
+              ? "bg-cyan-800 rounded-xl"
+              : "bg-gray-700 hover:bg-cyan-800 rounded-2xl hover:rounded-xl"
           }`}
           onClick={() => onServerSelect(server.id)}
         >
